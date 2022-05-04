@@ -148,7 +148,7 @@ bool ConveyorBeltMonitor::handle_get_part_pick_pose(
     // Loop forward, since the list is ordered from "older" parts to younger,
     // we want to get the oldest part possible
     const int num_parts = current_parts.size();
-    if (num_parts <=3){
+    if (num_parts < 2){
         const ConveyorBeltPart& part = current_parts.at(0);
 
         // for (const ConveyorBeltPart& part : current_parts)

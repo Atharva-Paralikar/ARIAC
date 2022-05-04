@@ -441,10 +441,19 @@ namespace {
     geometry_msgs::Pose estimate_pose(geometry_msgs::Pose part_pose,double dt)
     {
         geometry_msgs::Pose estimated_pose = part_pose;
-        ROS_INFO_STREAM(part_pose);
-        estimated_pose.position.y -= part_pose.position.y * 0.2 * dt;
-        ROS_INFO_STREAM(estimated_pose);
-        return estimated_pose;
+        if (part_pose.position.y >= 0){
+            ROS_INFO_STREAM("part_pose "<<part_pose);
+            estimated_pose.position.y -= part_pose.position.y * 0.2 * dt;
+            ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
+            return estimated_pose;
+        }
+        else{
+            ROS_INFO_STREAM("part_pose "<<part_pose);
+            estimated_pose.position.y += part_pose.position.y * 0.2 * dt;
+            ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
+            return estimated_pose;
+        }
+        
     }
 
     bool check_for_part_on_conveyor(ros::ServiceClient * client,
@@ -491,16 +500,19 @@ namespace {
             goal_in_tray.position.y= 0.1;
             goal_in_tray.position.z= 0;
             if (part_pose.position.x!=0 && part_pose.position.y!=0){
-                conveyor_pose.position.y = part_pose.position.y - 1;
+                conveyor_pose.position.y = part_pose.position.y - 1.4;
 
                 bool flip_ = true;
                 arm->goToPresetLocation("home1",1,conveyor_pose.position.y);
-                while(part_pose.position.y - conveyor_pose.position.y > 0.28){
+                auto a = abs((part_pose.position.y) - (conveyor_pose.position.y));
+                while(a > 0.28){
                     part_pose = estimate_pose(part_pose,1.4);
+                    a = abs((part_pose.position.y) - (conveyor_pose.position.y));
+                    ROS_WARN_STREAM("Default:"<< a);
                     ros::Duration(1.4).sleep();
                     // ROS_INFO_STREAM(part_pose);
                 }
-                ros::Duration(1.45).sleep();
+                ros::Duration(1.4).sleep();
                 // if (part_pose.position.y - conveyor_pose.position.y < 0.28){
                 ROS_INFO_STREAM("Part ready for pickup!");
                 pickup_pose.position.x = part_pose.position.x;
