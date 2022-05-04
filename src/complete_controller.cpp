@@ -903,27 +903,28 @@ namespace {
                         continue;
                     }
                     ROS_INFO_STREAM(part_frame);
-                    // bool flip_ =check_for_flip_part(product.type,part_frame,garm,product.pose,as.station_id);
+                    bool flip_ =check_for_flip_part(product.type,part_frame,garm,product.pose,as.station_id);
 
                     // Move the part from where it is to the AGV bed
-                    // if (flip_)
-                    // {
-                    //     arm->goToPresetLocation("home2");
-                    //     ROS_WARN_STREAM("flip part");
-                    //     cater_flip_parts_assembly(product.type,garm,part_frame,product.pose, as.station_id);
-                    //     ros::Duration(2).sleep();
-                    //     cater_flip_parts_assembly(product.type,garm,part_frame,product.pose, as.station_id);
-                    //     //  garm->moveBaseTo(world_pose.position.x, world_pose.position.y);
-                    // }
-                    // else
-                    // {
+                    if (flip_)
+                    {
+                        arm->goToPresetLocation("home2");
+                        ROS_WARN_STREAM("flip part");
+                        cater_flip_parts_assembly(product.type,garm,part_frame,product.pose, as.station_id);
+                        ros::Duration(2).sleep();
+                        cater_flip_parts_assembly(product.type,garm,part_frame,product.pose, as.station_id);
+                        garm->movePart(product.type, part_frame, product.pose, as.station_id);
+                        //  garm->moveBaseTo(world_pose.position.x, world_pose.position.y);
+                    }
+                    else
+                    {
                         // arm->goToPresetLocation("home2");
                         // ROS_WARN_STREAM("No flip");
                         ROS_INFO_STREAM("Moving part '" << product.type << "' to '" <<  as.station_id << "' (" << part_frame << ")");
                         garm->movePart(product.type, part_frame, product.pose, as.station_id);
                         ROS_INFO_STREAM("Placed part '" << product.type << "' at '" <<  as.station_id << "'");
                         // garm->moveBaseTo(world_pose.position.x, world_pose.position.y);
-                    // }
+                    }
                     
                     
                     // ROS_INFO_STREAM("Moving part '" << product.type << "' to '" << as.station_id << "' (" << part_frame << ")");
