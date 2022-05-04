@@ -522,7 +522,7 @@ namespace {
                 // if (part_pose.position.y - conveyor_pose.position.y < 0.28){
                 ROS_INFO_STREAM("Part ready for pickup!");
                 pickup_pose.position.x = part_pose.position.x + 0.01;
-                pickup_pose.position.y = part_pose.position.y;
+                pickup_pose.position.y = part_pose.position.y + 0.2;
                 pickup_pose.position.z = part_pose.position.z;
                 if (arm->conveyorPickPart(pickup_pose)) {
                 ROS_INFO_STREAM("Part picked up!");
