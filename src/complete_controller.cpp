@@ -512,10 +512,10 @@ namespace {
                     ros::Duration(1.4).sleep();
                     // ROS_INFO_STREAM(part_pose);
                 }
-                ros::Duration(1.4).sleep();
+                ros::Duration(1.2).sleep();
                 // if (part_pose.position.y - conveyor_pose.position.y < 0.28){
                 ROS_INFO_STREAM("Part ready for pickup!");
-                pickup_pose.position.x = part_pose.position.x;
+                pickup_pose.position.x = part_pose.position.x+0.01;
                 pickup_pose.position.y = part_pose.position.y - 0.28;
                 pickup_pose.position.z = part_pose.position.z;
                 if (arm->conveyorPickPart(pickup_pose)) {
@@ -604,9 +604,10 @@ namespace {
                         << agility->get_logical_camera_contents()
                     );
                     pick_part_conveyor(arm,Conveyor_client,agility);
-                    ros::Duration(2).sleep();
+                    // ros::Duration(10).sleep();
                     // ros::shutdown();
                     // return;
+                    
                 }
                 bin_indices = agility->get_camera_indices_of(product.type);
 
@@ -691,11 +692,12 @@ namespace {
                             arm->movePart(product.type, part_frame, product.pose, ks.agv_id);
                             ROS_INFO_STREAM("Placed part '" << product.type << "' at '" << ks.agv_id << "'");
                         }
+                        
                         // ROS_INFO_STREAM("Moving part '" << product.type << "' to '" << ks.agv_id << "' (" << part_frame << ")");
                         // arm->movePart(product.type, part_frame, product.pose, ks.agv_id);
                         // ROS_INFO_STREAM("Placed part '" << product.type << "' at '" << ks.agv_id << "'");
                     }
-
+                    
                     agility->queue_for_fault_verification(
                         product,
                         order_id,
