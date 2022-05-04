@@ -442,15 +442,15 @@ namespace {
     {
         geometry_msgs::Pose estimated_pose = part_pose;
         if (part_pose.position.y >= 0){
-            ROS_INFO_STREAM("part_pose "<<part_pose);
+            // ROS_INFO_STREAM("part_pose "<<part_pose);
             estimated_pose.position.y -= part_pose.position.y * 0.2 * dt;
-            ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
+            // ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
             return estimated_pose;
         }
         else{
-            ROS_INFO_STREAM("part_pose "<<part_pose);
+            // ROS_INFO_STREAM("part_pose "<<part_pose);
             estimated_pose.position.y += part_pose.position.y * 0.2 * dt;
-            ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
+            // ROS_INFO_STREAM("estimated_pose "<<estimated_pose);
             return estimated_pose;
         }
         
@@ -496,11 +496,17 @@ namespace {
 
             ROS_INFO_STREAM(free_bin);
             geometry_msgs::Pose goal_in_tray;
-            goal_in_tray.position.x= 0.1;
-            goal_in_tray.position.y= 0.1;
-            goal_in_tray.position.z= 0;
+            goal_in_tray.position.x = 0.1;
+            goal_in_tray.position.y = 0.1;
+            goal_in_tray.position.z = 0;
+            auto goal_in_tray_quaternion=utils::quaternionFromEuler(0,0,0);
+            goal_in_tray.orientation.x = goal_in_tray_quaternion[0];
+            goal_in_tray.orientation.y = goal_in_tray_quaternion[1];
+            goal_in_tray.orientation.z = goal_in_tray_quaternion[2];
+            goal_in_tray.orientation.w = goal_in_tray_quaternion[3];
+
             if (part_pose.position.x!=0 && part_pose.position.y!=0){
-                conveyor_pose.position.y = part_pose.position.y - 1.4;
+                conveyor_pose.position.y = part_pose.position.y - 1.2;
 
                 bool flip_ = true;
                 arm->goToPresetLocation("home1",1,conveyor_pose.position.y);
@@ -508,15 +514,15 @@ namespace {
                 while(a > 0.28){
                     part_pose = estimate_pose(part_pose,1.4);
                     a = abs((part_pose.position.y) - (conveyor_pose.position.y));
-                    ROS_WARN_STREAM("Default:"<< a);
+                    // ROS_WARN_STREAM("Default:"<< a);
                     ros::Duration(1.4).sleep();
                     // ROS_INFO_STREAM(part_pose);
                 }
-                ros::Duration(1.2).sleep();
+                ros::Duration(1.45).sleep();
                 // if (part_pose.position.y - conveyor_pose.position.y < 0.28){
                 ROS_INFO_STREAM("Part ready for pickup!");
-                pickup_pose.position.x = part_pose.position.x+0.01;
-                pickup_pose.position.y = part_pose.position.y - 0.28;
+                pickup_pose.position.x = part_pose.position.x + 0.01;
+                pickup_pose.position.y = part_pose.position.y;
                 pickup_pose.position.z = part_pose.position.z;
                 if (arm->conveyorPickPart(pickup_pose)) {
                 ROS_INFO_STREAM("Part picked up!");
@@ -541,8 +547,8 @@ namespace {
     //   if (!picked){
         if(!check_for_part_on_conveyor(Conveyor_client,arm,agility))
         {
-            // ros::Duration(2.0).sleep();
-             pick_part_conveyor(arm,Conveyor_client,agility);
+            ros::Duration(2.0).sleep();
+            pick_part_conveyor(arm,Conveyor_client,agility);
     //   }
         }
     }
@@ -604,10 +610,9 @@ namespace {
                         << agility->get_logical_camera_contents()
                     );
                     pick_part_conveyor(arm,Conveyor_client,agility);
-                    // ros::Duration(10).sleep();
+                    ros::Duration(2).sleep();
                     // ros::shutdown();
                     // return;
-                    
                 }
                 bin_indices = agility->get_camera_indices_of(product.type);
 
@@ -692,12 +697,11 @@ namespace {
                             arm->movePart(product.type, part_frame, product.pose, ks.agv_id);
                             ROS_INFO_STREAM("Placed part '" << product.type << "' at '" << ks.agv_id << "'");
                         }
-                        
                         // ROS_INFO_STREAM("Moving part '" << product.type << "' to '" << ks.agv_id << "' (" << part_frame << ")");
                         // arm->movePart(product.type, part_frame, product.pose, ks.agv_id);
                         // ROS_INFO_STREAM("Placed part '" << product.type << "' at '" << ks.agv_id << "'");
                     }
-                    
+
                     agility->queue_for_fault_verification(
                         product,
                         order_id,
@@ -790,7 +794,7 @@ namespace {
                 ros::shutdown();
                 return;
             }
-        }
+         }
     }
     void cater_assembly_shipments(const AriacAgvMap& agv_map,
                                  AgilityChallenger* const agility,
@@ -1113,7 +1117,7 @@ int main(int argc, char **argv)
     nist_gear::Order current_order;
     // ros::Duration rate(0.1);
     ros::Duration rate(0.1);
-    // pick_part_conveyor( &arm,  &Conveyor_client, &agility);
+    // pick_part_conveyor( &arm,  &Conveyor_client, &agility); ///uncomment if...;)
     while (ros::ok())
     {
         current_order_priority = agility.consume_pending_order(current_order);
